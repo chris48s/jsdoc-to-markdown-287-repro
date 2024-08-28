@@ -7,5 +7,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
-      - run: ./node_modules/.bin/jsdoc2md lib.js -t api-template.hbs
+
+      - name: Install Packages
+        run: npm ci
+
+      - name: Generate docs using template without front matter (this step will pass)
+        run: ./node_modules/.bin/jsdoc2md lib.js -t template-without-frontmatter.hbs
+
+      - name: Generate docs using template with front matter (this will pass first time)
+        run: ./node_modules/.bin/jsdoc2md lib.js -t template-with-frontmatter.hbs
+
+      - name: Perform a trivial edit on input file (change 'This function does a thing' to 'This function does stuff')
+        run: sed -i 's/a thing/stuff/g' lib.js
+
+      - name: Generate docs using template with front matter (this time it will fail)
+        run: ./node_modules/.bin/jsdoc2md lib.js -t template-with-frontmatter.hbs
